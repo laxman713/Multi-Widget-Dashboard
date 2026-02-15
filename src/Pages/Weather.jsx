@@ -18,7 +18,7 @@ function Weather({ isDarkMode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_KEY = "526f1551ed20e9def53041607c953b81"; // 🔴 Replace with your real OpenWeatherMap API key
+  const API_KEY = process.env.REACT_APP_WEATHER_KEY; // 🔴 Replace with your real OpenWeatherMap API key
 
   const fetchWeather = async (searchCity) => {
     setLoading(true);
@@ -57,7 +57,7 @@ function Weather({ isDarkMode }) {
 
   useEffect(() => {
     fetchWeather(city);
-  }, []);
+  }, [city]);
 
   const handleSearch = () => {
     if (city.trim() !== "") fetchWeather(city);

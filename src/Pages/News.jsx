@@ -7,7 +7,7 @@ function News({ isDarkMode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_KEY = "bc22031b1eda481d8fed24ccd8edc5b0"; // replace with your API key
+  const API_KEY = process.env.REACT_APP_NEWS_KEY;// replace with your API key
 
   useEffect(() => {
     const fetchNews = async () => {
