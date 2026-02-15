@@ -1,6 +1,4 @@
-
-//weather.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -18,13 +16,14 @@ function Weather({ isDarkMode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_KEY = process.env.REACT_APP_WEATHER_KEY; // 🔴 Replace with your real OpenWeatherMap API key
-
-  const fetchWeather = async (searchCity) => {
+  const fetchWeather = useCallback(async (searchCity) => {
     setLoading(true);
     setError(null);
     setChartData([]);
+
     try {
+      const API_KEY = process.env.REACT_APP_WEATHER_KEY;
+
       const url = `https://api.openweathermap.org/data/2.5/forecast?q=${searchCity}&units=metric&appid=${API_KEY}`;
       const response = await fetch(url);
       const data = await response.json();
@@ -53,14 +52,16 @@ function Weather({ isDarkMode }) {
       setError("Failed to fetch weather");
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWeather(city);
-  }, [city]);
+  }, [city, fetchWeather]);
 
   const handleSearch = () => {
-    if (city.trim() !== "") fetchWeather(city);
+    if (city.trim() !== "") {
+      fetchWeather(city);
+    }
   };
 
   return (
