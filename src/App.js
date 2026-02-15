@@ -2,80 +2,63 @@ import React, { useState, Suspense } from "react";
 import Home from "./Pages/Home";
 import Crypto from "./Pages/Crypto";
 import News from "./Pages/News";
-const Weather  = React.lazy(()=>import("./Pages/Weather"))
+const Weather = React.lazy(() => import("./Pages/Weather"));
 
 function App() {
-  // Track each widget type individually
-  const [activeWidgets, setActiveWidgets] = useState({
-    home: true,
-    weather: false,
-    crypto: false,
-    news: false,
-  });
+  const [activeWidget, setActiveWidget] = useState("home");
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const openWidget = (type) => {
-    setActiveWidgets({
-      home: false,
-      weather: false,
-      crypto: false,
-      news: false,
-      [type]: true, // overwrite current widget with the selected one
-    });
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => !prev);
-    localStorage.setItem("darkMode", !isDarkMode);
+  const renderWidget = () => {
+    switch (activeWidget) {
+      case "weather":
+        return (
+          <Suspense fallback={<div>Loading...</div>}>
+            <Weather />
+          </Suspense>
+        );
+      case "crypto":
+        return <Crypto />;
+      case "news":
+        return <News />;
+      default:
+        return <Home navigate={setActiveWidget} />;
+    }
   };
 
   return (
-   <div className={isDarkMode ? "bg-primary text-light min-vh-100" : "bg-light text-dark min-vh-100"}>
-  {/* Navbar */}
-  <nav
-  className={`navbar sticky-top ${
-    isDarkMode ? "navbar-dark bg-dark" : "navbar-light bg-light"
-  }`}
->
-  <span
-    className={`navbar-brand mb-0 h1 ${
-      isDarkMode ? "text-light" : "text-dark"
-    }`}
-  >
-   Multi Widget Dashboard
-  </span>
-  <button
-    className="btn btn-outline-secondary ms-auto"
-    onClick={toggleDarkMode}
-  >
-    {isDarkMode ? "Light Mode" : "Dark Mode"}
-  </button>
-</nav>
+    <div className="app-layout d-flex flex-column vh-100">
 
+      {/* NAVBAR */}
+      <nav className="navbar custom-navbar px-4">
+        <span className="navbar-brand fw-semibold">
+          Multi Widget Dashboard
+        </span>
+      </nav>
 
-  {/* Main Layout */}
-  <div className="d-flex">
-    {/* Sidebar */}
-    <div className={`p-3 ${isDarkMode ? "bg-dark text-light" : "bg-light text-dark"}`}
-         style={{ width: "250px", minHeight: "100vh" }}>
-      <button className="btn btn-outline-primary w-100 mb-2" onClick={() => openWidget("home")}>Home</button>
-      <button className="btn btn-outline-primary w-100 mb-2" onClick={() => openWidget("weather")}>Weather</button>
-      <button className="btn btn-outline-primary w-100 mb-2" onClick={() => openWidget("crypto")}>Crypto</button>
-      <button className="btn btn-outline-primary w-100 mb-2" onClick={() => openWidget("news")}>News</button>
+      <div className="d-flex flex-grow-1">
+
+        {/* SIDEBAR */}
+        <aside className="custom-sidebar p-4">
+          <div className="sidebar-title mb-4">Widgets</div>
+
+          {["home", "weather", "crypto", "news"].map((item) => (
+            <button
+              key={item}
+              onClick={() => setActiveWidget(item)}
+              className={`sidebar-btn ${
+                activeWidget === item ? "active" : ""
+              }`}
+            >
+              {item.charAt(0).toUpperCase() + item.slice(1)}
+            </button>
+          ))}
+        </aside>
+
+        {/* CONTENT */}
+        <main className="flex-grow-1 content-area p-4">
+          {renderWidget()}
+        </main>
+      </div>
     </div>
-
-    {/* Main Content */}
-    <div className="flex-grow-1 p-4">
-      {activeWidgets.home && <Home />}
-      <Suspense fallback={<div>Loading...</div>}>
-      {activeWidgets.weather && <Weather isDarkMode={isDarkMode} />}
-      </Suspense>
-      {activeWidgets.crypto && <Crypto isDarkMode={isDarkMode} />}
-      {activeWidgets.news && <News isDarkMode={isDarkMode} />}
-    </div>
-  </div>
-</div>
   );
 }
 

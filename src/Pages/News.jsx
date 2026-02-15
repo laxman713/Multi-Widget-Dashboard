@@ -1,3 +1,5 @@
+
+// News.js
 import { useState, useEffect } from "react";
 
 function News({ isDarkMode }) {
